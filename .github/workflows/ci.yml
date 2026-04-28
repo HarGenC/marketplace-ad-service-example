@@ -13,11 +13,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
       - name: setup uv
         uses: astral-sh/setup-uv@v1
+        with:
+          version: "latest"
 
       - name: install dependencies
-        run: uv sync
+        run: uv sync --all-groups
       
       - name: Run ruff check
         run: uv run ruff check src/ bin/
@@ -32,12 +39,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      
-      - name: install uv
-        run: pip install uv
+
+      - name: setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: setup uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "latest"
 
       - name: install dependencies
-        run: uv sync
+        run: uv sync --all-groups
       
       - name: Run tests
         run: uv run pytest tests/ -v

@@ -32,7 +32,7 @@ COPY . .
 
 RUN chown -R appuser:appgroup /app
 
-EXPOSE 8002
+EXPOSE 8000
 
 USER appuser
 

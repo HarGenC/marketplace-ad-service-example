@@ -18,6 +18,8 @@ async def main() -> None:
     settings = Settings()
     engine = create_engine(settings)
     session_factory = create_session_factory(engine)
+    print("Starting outbox relay...")
+    print(f"Kafka Bootstrap Servers: {settings.kafka_bootstrap_servers}")
 
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.kafka_bootstrap_servers,

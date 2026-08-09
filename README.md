@@ -29,7 +29,7 @@ make migrate
 make run
 
 # В соседнем терминале — relay, который шлёт события из outbox в Kafka
-make outbox-relay
+make outbox
 ```
 
 Сервер стартует на `http://localhost:8002`.
@@ -70,7 +70,7 @@ make outbox-relay
 Publish-after-commit по наивному сценарию (`send_and_wait` после `uow.commit`) теряет события, если процесс падает между коммитом и отправкой. Чтобы этого не было, используется **Outbox-паттерн**:
 
 1. Use case в одной транзакции пишет строку в таблицу `outbox` (`event_type`, `payload`) **и** изменение объявления — либо обе записи закоммитятся, либо ни одна.
-2. Отдельный процесс `make outbox-relay` крутит цикл:
+2. Отдельный процесс `make outbox` крутит цикл:
    - `SELECT ... FROM outbox WHERE published_at IS NULL ... FOR UPDATE SKIP LOCKED LIMIT N`
    - шлёт каждое сообщение в Kafka
    - проставляет `published_at = now()`
@@ -95,7 +95,8 @@ Publish-after-commit по наивному сценарию (`send_and_wait` п�
 | Команда                          | Описание                          |
 |----------------------------------|-----------------------------------|
 | `make run`                       | Запуск сервера                    |
-| `make outbox-relay`              | Воркер: outbox → Kafka            |
+| `make outbox`                    | Воркер: outbox → Kafka            |
+| `make seed`                      | Наполнение БД тестовыми данными   |
 | `make check`                     | Линтинг + форматирование (ruff)   |
 | `make test`                      | Запуск тестов                     |
 | `make lint`                      | `ruff check --fix`                |

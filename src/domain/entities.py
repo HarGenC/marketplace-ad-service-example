@@ -57,6 +57,11 @@ class Ad:
         self.city = city
         self.updated_at = datetime.now(UTC)
 
+    def register_view(self) -> None:
+        if self.status == AdStatus.ARCHIVED:
+            raise AdAlreadyArchivedError
+        self.views += 1
+
     def archive(self) -> None:
         if self.status == AdStatus.ARCHIVED:
             raise AdAlreadyArchivedError

@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import UTC, datetime
 from types import TracebackType
 from typing import Any, List
@@ -45,7 +46,8 @@ class FakeAdRepository(AdRepository):
         return ad
 
     async def get_by_id(self, ad_id: int) -> Ad | None:
-        return self._ads.get(ad_id)
+        ad = self._ads.get(ad_id)
+        return replace(ad) if ad is not None else None
 
     async def list(
         self,
@@ -63,6 +65,11 @@ class FakeAdRepository(AdRepository):
 
     async def save(self, ad: Ad) -> None:
         self._ads[ad.id] = ad
+
+    async def increment_views(self, ad_id: int) -> None:
+        stored = self._ads.get(ad_id)
+        if stored is not None:
+            stored.views += 1
 
 
 class FakeOutboxRepository(OutboxRepository):

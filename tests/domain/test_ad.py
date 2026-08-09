@@ -76,6 +76,23 @@ def test_edit_on_archived_raises() -> None:
         )
 
 
+def test_register_view_increments_counter() -> None:
+    ad = _make_ad()
+    before = ad.updated_at
+
+    ad.register_view()
+    ad.register_view()
+
+    assert ad.views == 2
+    assert ad.updated_at == before
+
+
+def test_register_view_on_archived_raises() -> None:
+    ad = _make_ad(status=AdStatus.ARCHIVED)
+    with pytest.raises(AdAlreadyArchivedError):
+        ad.register_view()
+
+
 def test_archive_sets_status() -> None:
     ad = _make_ad()
     ad.archive()

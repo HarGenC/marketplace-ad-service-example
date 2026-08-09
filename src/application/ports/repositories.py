@@ -35,3 +35,9 @@ class AdRepository(ABC):
         self,
         ad: Ad,
     ) -> None: ...
+
+    @abstractmethod
+    async def increment_views(
+        self,
+        ad_id: int,
+    ) -> None: ...

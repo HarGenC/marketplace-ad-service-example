@@ -90,6 +90,16 @@ class SQLAlchemyAdRepository(AdRepository):
             )
         )
 
+    async def increment_views(
+        self,
+        ad_id: int,
+    ) -> None:
+        await self._session.execute(
+            update(AdModel)
+            .where(AdModel.id == ad_id)
+            .values(views=AdModel.views + 1, updated_at=AdModel.updated_at)
+        )
+
 
 def _to_entity(model: AdModel) -> Ad:
     return Ad(

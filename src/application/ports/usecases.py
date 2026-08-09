@@ -46,6 +46,14 @@ class DeleteAdPort(ABC):
     ) -> None: ...
 
 
+class IncrementAdViewsPort(ABC):
+    @abstractmethod
+    async def execute(
+        self,
+        ad_id: int,
+    ) -> Ad: ...
+
+
 class GetAdPort(ABC):
     @abstractmethod
     async def execute(

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = 8002
     kafka_bootstrap_servers: str = "redpanda:29092"
     kafka_topic_ads: str = "ads"
     auth_service_url: str = "http://localhost:8000"

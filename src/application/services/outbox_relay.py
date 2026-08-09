@@ -4,6 +4,7 @@ from typing import Callable
 
 from src.application.ports.message_broker import MessageBroker
 from src.application.ports.uow import UnitOfWork
+from src.trace import trace_context
 
 logger = logging.getLogger(__name__)
 
@@ -39,14 +40,20 @@ class OutboxRelay:
                 return 0
 
             for message in messages:
-                await self._broker.send(
-                    {
-                        "event": message.event_type,
-                        "payload": message.payload,
-                    },
-                )
+                with trace_context(message.trace_id):
+                    await self._broker.send(
+                        {
+                            "event": message.event_type,
+                            "payload": message.payload,
+                        },
+                    )
+                    logger.info(
+                        "published outbox message %d (%s)",
+                        message.id,
+                        message.event_type,
+                    )
 
             await uow.outbox.mark_published([m.id for m in messages])
             await uow.commit()
-            logger.info("relayed %d outbox messages", len(messages))
+            logger.debug("relayed %d outbox messages", len(messages))
             return len(messages)

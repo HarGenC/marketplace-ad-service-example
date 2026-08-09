@@ -4,6 +4,7 @@ import pytest
 
 from src.application.ports.message_broker import MessageBroker
 from src.application.services.outbox_relay import OutboxRelay
+from src.trace import trace_context
 from tests.conftest import FakeMessageBroker, FakeUnitOfWork
 
 
@@ -41,6 +42,22 @@ async def test_relay_noop_when_outbox_empty(
     assert processed == 0
     assert fake_broker.sent == []
     assert not fake_uow.committed
+
+
+@pytest.mark.asyncio
+async def test_relay_publishes_within_message_trace_context(
+    fake_uow: FakeUnitOfWork, fake_broker: FakeMessageBroker
+) -> None:
+    with trace_context("abc"):
+        await fake_uow.outbox.add("ad.created", {"ad_id": 1})
+    await fake_uow.outbox.add("ad.updated", {"ad_id": 2})
+
+    relay = OutboxRelay(uow_factory=lambda: fake_uow, broker=fake_broker)
+    await relay._process_batch()
+
+    traced, untraced = fake_broker.sent_trace_ids
+    assert traced == "abc"
+    assert untraced and untraced != "abc"
 
 
 @pytest.mark.asyncio

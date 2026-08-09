@@ -11,6 +11,7 @@ from src.application.ports.repositories import AdRepository
 from src.application.ports.uow import UnitOfWork
 from src.application.ports.user_profile import UserInfo, UserProfileService
 from src.domain.entities import Ad, AdStatus
+from src.trace import get_trace_id
 
 
 class FakeAdRepository(AdRepository):
@@ -79,7 +80,12 @@ class FakeOutboxRepository(OutboxRepository):
 
     async def add(self, event_type: str, payload: dict[str, Any]) -> None:
         self.messages.append(
-            OutboxMessage(id=self._next_id, event_type=event_type, payload=payload)
+            OutboxMessage(
+                id=self._next_id,
+                event_type=event_type,
+                payload=payload,
+                trace_id=get_trace_id() or None,
+            )
         )
         self._next_id += 1
 
@@ -93,9 +99,11 @@ class FakeOutboxRepository(OutboxRepository):
 class FakeMessageBroker(MessageBroker):
     def __init__(self) -> None:
         self.sent: list[dict[str, Any]] = []
+        self.sent_trace_ids: list[str] = []
 
     async def send(self, payload: dict[str, Any]) -> None:
         self.sent.append(payload)
+        self.sent_trace_ids.append(get_trace_id())
 
 
 class FakeUserProfileService(UserProfileService):

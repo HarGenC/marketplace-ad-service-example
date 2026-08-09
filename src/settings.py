@@ -12,9 +12,12 @@ class Settings(BaseSettings):
     postgres_password: str = "postgres"
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
-    kafka_bootstrap_servers: str = "ad-redpanda:9092"
+    api_host: str = "0.0.0.0"
+    api_port: int = 8000
+    kafka_bootstrap_servers: str = "redpanda:29092"
     kafka_topic_ads: str = "ads"
     auth_service_url: str = "http://localhost:8000"
+    log_level: str = "INFO"
 
     @property
     def database_url(self) -> str:

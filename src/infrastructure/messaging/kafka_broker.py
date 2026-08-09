@@ -4,6 +4,7 @@ import typing
 from aiokafka import AIOKafkaProducer
 
 from src.application.ports.message_broker import MessageBroker
+from src.trace import get_trace_id, to_kafka_headers
 
 
 class KafkaMessageBroker(MessageBroker):
@@ -12,7 +13,11 @@ class KafkaMessageBroker(MessageBroker):
         self._topic = topic
 
     async def send(self, payload: dict[str, typing.Any]) -> None:
-        await self._producer.send_and_wait(self._topic, payload)
+        await self._producer.send_and_wait(
+            self._topic,
+            payload,
+            headers=to_kafka_headers(get_trace_id()),
+        )
 
 
 def serialize(value: dict[str, typing.Any]) -> bytes:

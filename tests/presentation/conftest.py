@@ -10,6 +10,7 @@ from src.presentation.api.dependencies import (
     get_uow,
     get_user_profile_service,
 )
+from src.presentation.api.middleware import TraceIdMiddleware
 from src.presentation.api.routes.internal import router as internal_router
 from src.presentation.api.routes.public import router as public_router
 from src.settings import Settings
@@ -37,6 +38,7 @@ def app(
     fake_user_profile: FakeUserProfileService,
 ) -> FastAPI:
     app = FastAPI()
+    app.add_middleware(TraceIdMiddleware)
     app.include_router(public_router)
     app.include_router(internal_router)
 

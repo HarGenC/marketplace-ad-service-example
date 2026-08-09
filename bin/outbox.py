@@ -10,15 +10,18 @@ from src.infrastructure.persistence.database import (
     create_session_factory,
 )
 from src.infrastructure.persistence.uow import SQLAlchemyUnitOfWork
+from src.logging_setup import setup_logging
 from src.settings import Settings
+
+logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
-    logging.basicConfig(level=logging.INFO)
     settings = Settings()
+    setup_logging(settings.log_level)
     engine = create_engine(settings)
     session_factory = create_session_factory(engine)
-    print("Starting outbox relay...")
+    logger.info("starting outbox relay")
 
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.kafka_bootstrap_servers,
